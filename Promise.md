@@ -101,3 +101,135 @@ Promise.any([p1, p2, p3])
   .catch((error) => console.error(error));
 ```
 
+#### 简单实现一个Promise
+const promse = new Promise((resolve,reject)=>{}).then().catch
+```
+Class MyPromise {
+  constructor(executor){
+    this.status = 'pending'
+    this.onRejectCallback = [] //失败回调函数队列
+    this.onResolveCallback = [] //成功回调函数队列
+    resolve(value){
+      if(this.status === 'pending'){
+        this.status = 'fulfilled'
+        this.value = value
+        this.onResolveCallback.forEach(fn=>fn())
+      }
+    }
+    reject(err){
+      if(this.status === 'pending'){
+        this.status = 'rejected'
+        this.reason = err
+        this.onRejectCallback.forEach(fn=>fn())
+      }
+    }
+    try {
+      executor(resolve,reject)
+    }catch(err){
+      reject(err)
+    }
+  }
+
+  then(onFulfilled,onRejected){
+    onFulfilled = typeof onFulfilled === 'function'?onFulfilled:value=>value
+    onRejected = typeof onRejected === 'function'?onRejected:reason=>{throw reason}
+    const promise2 = new MyPromise((resolve,reject)=>{
+      const handleFulfilled = ()=>{
+        queueMicroTask(()=>{
+          try {
+            const x = onFulfilled(this.value)
+            resolvePromise(promise2, x, resolve, reject)
+          }catch(err){
+            reject(err)
+          }
+        })
+      }
+       const handleRejected = () => {
+        queueMicrotask(() => {
+          try {
+            const x = onRejected(this.reason);
+            resolvePromise(promise2, x, resolve, reject);
+          } catch (err) {
+            reject(err);
+          }
+        });
+      };
+      if(this.status === 'fulfilled'){
+        handleFulfilled()
+      }
+      if(this.status === 'rejected'){
+        handleRejected()
+      }
+      if(this.status === 'pending'){
+        this.onResolveCallback.push(handleFulfilled)
+        this.onRejectCallback.push(handleRejected)
+      }
+    })
+    return promise2
+  }
+  catch(onRejected){
+    return this.then(null,onRejected)
+  }
+  static resolve(value){
+    return new MyPromise(resolve=>resolve(value))
+  }
+  static reject(reason){
+    return new MyPromise((null,onject)=>onject(reason))
+  }
+}
+// 解析 Promise 的递归函数（符合 Promise A+ 规范）
+function resolvePromise(promise2, x, resolve, reject) {
+  // 禁止循环引用：promise2 不能与 x 相同
+  if (promise2 === x) {
+    return reject(new TypeError('Chaining cycle detected for promise'));
+  }
+
+  // 如果 x 是 Promise 实例，则让 promise2 接受其状态
+  if (x instanceof MyPromise) {
+    x.then(
+      value => resolve(value),
+      reason => reject(reason)
+    );
+  } else if (x !== null && (typeof x === 'object' || typeof x === 'function')) {
+    // 处理 thenable 对象（例如第三方 Promise 实现）
+    let then;
+    try {
+      then = x.then;
+    } catch (err) {
+      return reject(err);
+    }
+
+    // 如果 then 是函数，则调用它并递归解析
+    if (typeof then === 'function') {
+      let called = false; // 防止重复调用
+      try {
+        then.call(
+          x,
+          value => {
+            if (!called) {
+              called = true;
+              resolvePromise(promise2, value, resolve, reject);
+            }
+          },
+          reason => {
+            if (!called) {
+              called = true;
+              reject(reason);
+            }
+          }
+        );
+      } catch (err) {
+        if (!called) {
+          reject(err);
+        }
+      }
+    } else {
+      // 普通对象/值，直接 resolve
+      resolve(x);
+    }
+  } else {
+    // 基础类型值，直接 resolve
+    resolve(x);
+  }
+}
+```
