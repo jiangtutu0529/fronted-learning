@@ -18,6 +18,17 @@ grid子项：
 aspect-ratio: 1
 
 
+1. flex: 1 代表什么？
+答案：flex: 1是 flex: 1 1 0%的简写，意思是：
+flex-grow: 1- 可以放大
+flex-shrink: 1- 可以缩小
+flex-basis: 0%- 基准大小为0
+2. flex-basis和width的区别？
+答案：
+flex-basis定义项目在主轴方向的空间
+width定义项目的固定宽度
+当同时设置时，flex-basis优先级高于 width
+
 ### grid布局
 grid是二维布局，将布局分为行和列，分别控制在行和列上面的布局
 flex是一维布局，只在一个维度控制布局，
@@ -160,3 +171,24 @@ grid-row-end 属性：下边框所在的水平网格线
 justify-self 属性设置单元格内容的水平位置（左中右），跟 justify-items 属性的用法完全一致，但只作用于单个项目
 
 align-self 属性设置单元格内容的垂直位置（上中下），跟align-items属性的用法完全一致，也是只作用于单个项目
+
+
+
+##### css3的animation
+```
+@keyframes animationName {
+  0% { opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.element {
+  /* 语法：name duration timing-function delay iteration-count direction fill-mode play-state */
+  animation: slideIn 2s ease 1s infinite alternate both;
+  
+  /* 多个动画 */
+  animation: 
+    fadeIn 1.5s ease-in-out,
+    slideIn 2s ease-out 0.5s;
+}
+```

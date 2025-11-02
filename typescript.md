@@ -81,3 +81,40 @@ outDir：输出目录
 #### .d.ts文件的作用
 声明文件用于描述已有的js库的类型信息，让ts能够理解
 
+##### 什么是TypeScript泛型？为什么要使用它？
+答案：泛型允许创建可重用的组件，这些组件可以支持多种类型而不是单一类型。主要好处：
+类型安全：在编译时捕获类型错误
+代码复用：编写一次，支持多种类型
+更好的类型推断：TypeScript可以更好地推断类型
+
+##### 泛型约束的作用是什么？举例说明
+答案：泛型约束使用extends关键字限制泛型参数必须满足某些条件
+```
+// 约束T必须有length属性
+interface HasLength {
+    length: number;
+}
+
+function getLength<T extends HasLength>(arg: T): number {
+    return arg.length;
+}
+
+getLength("hello"); // 正确
+getLength([1, 2, 3]); // 正确
+// getLength(123); // 错误：number没有length属性
+```
+
+#####  keyof关键字的作用是什么？
+答案：keyof操作符获取对象类型的所有键的联合类型
+```
+interface Person {
+    name: string;
+    age: number;
+}
+
+type PersonKeys = keyof Person; // "name" | "age"
+
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+    return obj[key];
+}
+```
