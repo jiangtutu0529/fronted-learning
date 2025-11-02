@@ -73,3 +73,25 @@ optimization: {
 4、通过websocket推送更新给浏览器
 5、浏览器更新替换模块，不刷新页面
 
+##### 写过什么loader?写过什么plugin？
+
+```
+
+const Regex = /woa\.com/
+const base64UrlPlugin = ({ types: t }) => ({
+  visitor: {
+    StringLiteral(path) {
+      const { value } = path.node
+      if (Regex.test(value)) {
+        const base64Url = Buffer.from(value).toString('base64')
+        console.log('【替换】', value, '=>', base64Url)
+        const atobCallExpression = t.callExpression(
+          t.identifier('atob'),
+          [t.stringLiteral(base64Url)],
+        )
+        path.replaceWith(atobCallExpression)
+      }
+    },
+  },
+})
+```
