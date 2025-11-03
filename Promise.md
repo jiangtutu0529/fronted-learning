@@ -233,3 +233,10 @@ function resolvePromise(promise2, x, resolve, reject) {
   }
 }
 ```
+
+##### Promise.then为什么可以链式调用？
+答案：
+每个then方法都返回一个新的Promise实例
+新Promise的状态由回调函数的返回值决定
+通过递归解析返回值，处理Promise、thenable对象和普通值
+实现了值的传递和错误的冒泡传播

@@ -160,5 +160,28 @@ function usePrevious(value){
 }
 ```
 
+##### context的核心原理
+```
+// Context创建
+const MyContext = React.createContext(defaultValue);
 
+// Context包含两个重要组件
+<MyContext.Provider value={/* 某个值 */}>
+  <MyContext.Consumer>
+    {value => /* 基于上下文值进行渲染*/}
+  </MyContext.Consumer>
+</MyContext.Provider>
+```
   
+
+1. Context的实现原理是什么？
+答案：Context通过React内部的Fiber树维护一个值栈。Provider组件将值存储在Context对象中，Consumer组件或useContext Hook通过遍历Fiber树找到最近的Provider来获取值。
+2. 为什么Context的value变化会导致所有消费者重新渲染？
+答案：当Provider的value变化时，React会遍历所有依赖此Context的组件，并标记它们需要更新。这是通过Fiber树的依赖追踪机制实现的。
+
+
+##### useEffect直接用async?
+不能，因为useEffect期待返回一个清理函数或者undefined,但是async返回了一个promise,违反了类型约定。
+解决：
+在useEffect内部定义和调用异步函数，
+使用立即执行函数

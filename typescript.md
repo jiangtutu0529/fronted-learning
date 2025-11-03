@@ -118,3 +118,28 @@ function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
     return obj[key];
 }
 ```
+
+##### ts常用类型API
+extends：约束泛型/条件类型判断
+T extends string ? ...
+
+keyof：获取对象所有 key 的联合类型
+keyof { a: 1, b: 2 }→ "a" \| "b"
+
+typeof：获取值的类型（在类型上下文中）
+typeof Math.random()→ () => number
+
+infer：在条件类型中推断类型变量
+T extends Promise<infer U> ? U : never
+
+Partial<T>- 所有属性变为可选
+Required<T>- 所有属性变为必填
+Readonly<T>- 所有属性变为只读
+Record<K, T>- 构造键类型为 K，值类型为 T 的对象
+Pick<T, K>- 从 T 中挑选一组属性 K
+Omit<T, K>- 从 T 中排除一组属性 K
+Exclude<T, U>- 从 T 中排除可分配给 U 的类型
+Extract<T, U>- 从 T 中提取可分配给 U 的类型
+NonNullable<T>- 从 T 中排除 null 和 undefined
+Parameters<T>- 获取函数参数类型元组
+ReturnType<T>- 获取函数返回值类型

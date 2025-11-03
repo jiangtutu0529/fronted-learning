@@ -94,3 +94,64 @@ function* mySaga() {
 状态只通过dispatch(action)触发reducer来更新
 
 Reducer必须是纯函数，不应有副作用(触发异步操作或触发action)
+
+##### redux和zustand比较
+Redux 原理：严格的单向数据流
+Redux 的核心原理可以用以下流程图概括，其核心是 “派发Action -> 执行Reducer -> 更新State -> 通知订阅者”的严格单向数据流
+单一数据源：整个应用的状态存储在一个 Store 中。
+纯函数Reducer：(previousState, action) => newState，必须是纯的，不能有副作用。
+不可变性：任何状态更新都必须通过返回一个新对象来完成。
+可预测性：状态的任何变化都由依次触发的 action 决定，易于跟踪和调试
+
+
+Zustand 原理：精简的发布-订阅模型
+Zustand 的原理更加直接，其核心是一个实现了发布-订阅模式的状态对象
+中心化 Store：也是一个单一 Store，但结构更扁平。
+类似 setState的 API：set(state => ({ newState }))，写法上像是可变的，但内部像 React 的 setState一样处理不可变性。
+精确重渲染：组件通过钩子（如 useStore）订阅 Store 中的特定状态字段。只有当这个字段真正变化时，组件才会重新渲染，默认具有类似 shallow浅比较的能力，性能很好。
+
+
+Redux 的底层是基于三个核心概念的结合：1. 观察者模式；2. 函数式编程的不可变性；3. 纯函数
+
+```
+// 这是一个极简的 Redux createStore 实现，展示了核心原理
+function createStore(reducer, preloadedState) {
+  let currentState = preloadedState; // 状态保存在闭包中
+  let currentListeners = []; // 监听器列表
+  
+  function getState() {
+    return currentState;
+  }
+  
+  function dispatch(action) {
+    // 1. 调用 reducer（纯函数）计算新状态
+    currentState = reducer(currentState, action);
+    
+    // 2. 通知所有订阅者
+    currentListeners.forEach(listener => {
+      listener(); // 触发监听器，比如让 React 组件重新渲染
+    });
+    
+    return action; // 返回 action 是为了链式调用
+  }
+  
+  function subscribe(listener) {
+    currentListeners.push(listener); // 注册监听器
+    
+    // 返回取消订阅的函数
+    return function unsubscribe() {
+      const index = currentListeners.indexOf(listener);
+      currentListeners.splice(index, 1);
+    };
+  }
+  
+  // 初始化 store，派发一个虚拟 action 来设置初始状态
+  dispatch({ type: '@@redux/INIT' });
+  
+  return {
+    getState,
+    dispatch,
+    subscribe
+  };
+}
+```

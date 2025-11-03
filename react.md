@@ -281,3 +281,164 @@ function MyComponent() {
 4、存储可变值：可以用来存储任何可变值，类似于类组件的实例属性
 
 在父组件需要访问子组件的节点，父节点传递ref给子组件，子组件使用React.forwardRef包裹，承接ref参数
+
+
+##### react18新特性
+1. 并发特性，自动批处理
+   ```
+   // React 17 及之前：只在React事件处理函数中批处理
+function handleClick() {
+  setCount(c => c + 1);     // 重新渲染
+  setFlag(f => !f);         // 重新渲染
+  // 结果：两次渲染
+}
+
+// React 18：在所有函数中自动批处理
+function handleClick() {
+  setCount(c => c + 1);     // 不立即渲染
+  setFlag(f => !f);         // 不立即渲染
+  // 结果：一次批处理渲染
+}
+
+// 异步操作中也批处理
+setTimeout(() => {
+  setCount(c => c + 1);
+  setFlag(f => !f);
+  // React 18：批处理，只渲染一次
+}, 1000);
+
+// 如果需要立即更新，使用flushSync
+import { flushSync } from 'react-dom';
+
+flushSync(() => {
+  setCount(c => c + 1);     // 立即渲染
+});
+flushSync(() => {
+  setFlag(f => !f);         // 立即渲染
+});
+   ```
+
+2. 新的根API
+```
+// React 17 及之前
+import ReactDOM from 'react-dom';
+import App from './App';
+
+ReactDOM.render(<App />, document.getElementById('root'));
+
+// React 18 新API
+import { createRoot } from 'react-dom/client';
+import App from './App';
+
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App />);
+
+// 支持并发特性
+root.render(
+  <React.unstable_ConcurrentMode>
+    <App />
+  </React.unstable_ConcurrentMode>
+);
+```
+
+3. 新hooks
+useTransition - 非阻塞UI更新
+```
+import { useState, useTransition, Suspense } from 'react';
+
+function SearchResults({ query }) {
+  const [isPending, startTransition] = useTransition();
+  const [results, setResults] = useState([]);
+  
+  function handleSearch(query) {
+    startTransition(() => {
+      // 非紧急更新：可以被打断
+      setResults(fetchResults(query));
+    });
+  }
+  
+  return (
+    <div>
+      <input 
+        onChange={(e) => handleSearch(e.target.value)}
+        placeholder="搜索..."
+      />
+      
+      {/* 显示加载状态 */}
+      {isPending && <div>加载中...</div>}
+      
+      <Suspense fallback={<div>加载结果...</div>}>
+        <ResultsList results={results} />
+      </Suspense>
+    </div>
+  );
+}
+```
+
+4. 服务端渲染新的API
+```
+import { Suspense } from 'react';
+import { createFromFetch } from 'react-server';
+```
+
+
+##### react和react-dom的区别
+```
+// React包只包含核心逻辑，不包含DOM操作
+import React from 'react';
+
+// React核心功能：
+// 1. 组件定义
+class MyComponent extends React.Component {}
+function MyFunctionalComponent() {}
+
+// 2. Hooks系统
+const [state, setState] = React.useState();
+React.useEffect(() => {});
+
+// 3. 虚拟DOM创建
+const element = React.createElement('div', { className: 'test' }, 'Hello');
+const jsxElement = <div className="test">Hello</div>;
+```
+
+```
+// React DOM负责将React组件渲染到浏览器DOM
+import ReactDOM from 'react-dom/client';
+
+// React DOM主要功能：
+// 1. DOM渲染
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+
+// 2. DOM事件处理
+// 3. DOM属性更新
+// 4. 服务端渲染
+```
+
+1. requestAnimationFrame
+作用
+requestAnimationFrame要求浏览器在下一次重绘之前执行指定的回调函数。这是实现流畅动画和连续更新的标准方式。
+执行时机
+一帧的生命周期：
+[处理输入事件] → [执行 rAF 回调] → [计算样式/布局/绘制] → [页面渲染]
+                      ↑
+              在这里执行，适合视觉更新
+
+2. requestIdleCallback
+作用
+requestIdleCallback在浏览器空闲时期执行回调函数，允许开发者在主事件循环上执行后台和低优先级工作，而不会影响延迟关键事件。
+执行时机
+一帧的生命周期：
+[处理任务] → [渲染工作] → [有空闲时间？] → [执行 rIC 回调]
+                                          ↑
+                                   只有这时才执行
+
+##### React和requestIdleCallback
+React 并没有直接使用或重写 requestIdleCallback，而是基于相似的空闲时间调度理念，自己实现了一个功能更强大的调度器。"
+"主要原因有四点：
+更精细的优先级控制：React 需要多级优先级，而原生 API 只有'空闲'和'非空闲'两种状态
+更稳定的执行频率：原生 API 的执行频率不足以支持流畅的60fps动画
+更好的超时控制：React 需要确保高优先级任务准时执行
+一致的跨浏览器行为：避免不同浏览器的实现差异"
+"这个自定义调度器是 React 并发模式（Concurrent Mode）的基石，使得特性如 useTransition、Suspense等能够实现'可中断的渲染'，从根本上改善了大型应用的用户体验。"
