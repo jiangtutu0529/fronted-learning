@@ -29,7 +29,7 @@ flex-basis定义项目在主轴方向的空间
 width定义项目的固定宽度
 当同时设置时，flex-basis优先级高于 width
 
-### grid布局
+#### grid布局
 grid是二维布局，将布局分为行和列，分别控制在行和列上面的布局
 flex是一维布局，只在一个维度控制布局，
 
@@ -174,7 +174,7 @@ align-self 属性设置单元格内容的垂直位置（上中下），跟align-
 
 
 
-##### css3的animation
+#### css3的animation
 ```
 @keyframes animationName {
   0% { opacity: 0; }
@@ -193,7 +193,7 @@ align-self 属性设置单元格内容的垂直位置（上中下），跟align-
 }
 ```
 
-##### position属性
+#### position属性
 ```
 position有五个主要的值：
 static（静态定位）
@@ -216,4 +216,234 @@ sticky（粘性定位）
 元素在跨越特定阈值前表现为相对定位（relative），之后变为固定定位（fixed）。
 必须指定 top, right, bottom, left四个阈值之一，粘性定位才会生效。这个值表示“离视口边缘还有多少距离时，触发固定效果”。
 这个定位的容器是其最近的滚动祖先（滚动条所在的祖先元素），如果祖先都不可滚动，则相对于视口固定
-##### css3最新属性
+#### css盒模型
+标准盒模型：
+```
+/* 标准盒模型（默认） */
+.box {
+  width: 200px;    /* 内容区域宽度 */
+  padding: 20px;   /* 增加内边距 */
+  border: 5px solid; /* 增加边框 */
+  /* 元素总宽度 = 200 + 20 * 2 + 5 * 2 = 250px */
+}
+```
+怪异盒模型
+```
+/* 怪异盒模型 */
+.box {
+  box-sizing: border-box; /* 切换为怪异盒模型 */
+  width: 200px;    /* 总宽度包含padding和border */
+  padding: 20px;
+  border: 5px solid;
+  /* 元素总宽度 = 200px，内容区域宽度 = 200 - 20 * 2 - 5 * 2 = 150px */
+}
+```
+
+标准盒模型：width= 内容宽度
+怪异盒模型：width= 内容宽度 + padding + border
+
+##### css权重计算
+权重计算规则：
+内联样式：1000
+ID 选择器：100
+类/伪类/属性选择器：10
+元素/伪元素选择器：1
+
+##### 常用伪类和伪元素
+/* 伪类 - 选择元素的特定状态 */
+a:hover { color: red; }           /* 鼠标悬停 */
+li:first-child { color: blue; }   /* 第一个子元素 */
+input:focus { outline: none; }    /* 获得焦点 */
+tr:nth-child(odd) { background: #f0f0f0; } /* 奇数行 */
+
+/* 伪元素 - 创建虚拟元素 */
+p::first-line { font-weight: bold; }     /* 第一行 */
+p::before { content: "→ "; }            /* 在前面插入内容 */
+p::after { content: "!"; }              /* 在后面插入内容 */
+::selection { background: yellow; }     /* 选中的文本 */
+
+##### 如何实现移动端适配
+
+```
+<!-- viewport 设置 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+/* 方案1：媒体查询 */
+.container {
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 5px;
+  }
+}
+
+/* 方案2：REM 布局 */
+html {
+  font-size: 16px; /* 1rem = 16px */
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 14px; /* 1rem = 14px */
+  }
+}
+
+.element {
+  width: 20rem; /* 响应式宽度 */
+}
+
+/* 方案3：Flex/Grid 自动适配 */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+```
+
+##### BFC是什么，如何创建
+创建
+```
+.container {
+  overflow: hidden;        /* 方法1 */
+  display: flow-root;     /* 方法2（推荐） */
+  float: left;            /* 方法3 */
+  position: absolute;     /* 方法4 */
+  display: inline-block;  /* 方法5 */
+}
+```
+作用
+```
+  .container {
+    border: 2px solid #ccc;
+    display: flow-root; /* 创建BFC */
+  }
+  .float-left {
+    float: left;
+    width: 100px;
+    height: 100px;
+    background: lightblue;
+  }
+  /* 没有BFC时，文字会环绕浮动元素 */
+  /* 有BFC时，容器会包含浮动元素 */
+</style>
+
+<div class="container">
+  <div class="float-left"></div>
+  <p>这段文字不会环绕浮动元素，因为容器创建了BFC。</p>
+</div>
+```
+
+##### 实现一个css三角形
+```
+.triangle {
+  width: 0;
+  height: 0;
+  border-width: 20px;
+  border-style: solid;
+  border-color: transparent transparent #000000 transparent;
+}
+
+```
+
+##### 文本溢出显示省略号
+单行文本：
+```
+text-overfow:ellipsis;
+overflow:hidden;
+white-space:nowarp;
+```
+多行文本：
+```
+/* 兼容性更好的多行文本方案 */
+.multi-line-fallback {
+  max-height: 4.5em;          /* 行高1.5em × 3行 */
+  line-height: 1.5em;
+  overflow: hidden;
+  position: relative;
+}
+
+.multi-line-fallback::after {
+  content: "...";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: white;
+  padding-left: 5px;
+}
+```
+
+##### rem和em
+em相对于当前元素的font-size大小
+rem相对于根元素也就是html的font-size大小
+
+如何选择？实践建议
+在实际项目中，通常将两者结合使用，发挥各自优势：
+使用 rem作为主要单位：
+用于布局尺寸（width, height）、内外边距（margin, padding，尤其是组件外部间距）。
+这样做的好处是，你只需要改变 <html>根元素的 font-size（例如通过媒体查询），整个页面的布局就可以按比例缩放，轻松实现响应式设计。
+使用 em用于特定组件内部：
+用于需要与字体大小紧密关联的属性。例如按钮的 padding、行高 line-height。
+这样，当你改变按钮的 font-size时，它的 padding会自动按比例调整，保持视觉平衡
+
+
+响应式设计中的应用
+利用 rem的全局性，可以通过媒体查询改变根字体大小，实现整体缩放。
+
+对于需要全局统一的尺寸用 rem，对于需要与当前字体大小成比例缩放的尺寸用 em
+
+
+##### 写一个图片懒加载
+图片懒加载属性loading = 'lazy'
+设置 loading="lazy"允许浏览器，延迟加载屏幕外图像 img 和 iframe，直到用户滚动到它们附近
+react实现图片懒加载
+
+```
+import React, { useRef, useState, useEffect } from 'react';
+
+const LazyImage = ({ src, alt, placeholder, className }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsLoaded(true);
+          observer.disconnect(); // 图片加载后停止观察
+        }
+      },
+      { threshold: 0.1 } // 10% 进入视口时触发
+    );
+
+    if (imgRef.current) {
+      observer.observe(imgRef.current);
+    }
+
+    return () => {
+      if (observer && imgRef.current) {
+        observer.unobserve(imgRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <img
+      ref={imgRef}
+      src={isLoaded ? src : placeholder}
+      alt={alt}
+      className={className}
+    />
+  );
+};
+
+export default LazyImage;
+```
+
+react-lazyload：轻量级懒加载库，支持图片、组件等。

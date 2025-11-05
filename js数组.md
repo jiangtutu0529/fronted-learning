@@ -94,3 +94,73 @@ function deepClone(arr){
 ```
 4、structuredClone浏览器API
 浏览器原生支持，兼容性IE不支持
+
+##### 数组扁平化
+1、使用 Array.prototype.flat()（ES2019）
+```
+const arr = [1, [2, [3, [4, 5]], 6]];
+const flattened = arr.flat(Infinity);
+console.log(flattened); // [1, 2, 3, 4, 5, 6]
+```
+2、手动实现
+```
+function flattenDeep(arr) {
+  const result = [];
+  
+  for (const item of arr) {
+    if (Array.isArray(item)) {
+      // 如果是数组，递归调用，并将结果通过扩展运算符或concat放入result
+      result.push(...flattenDeep(item));
+      // 或者用： result = result.concat(flattenDeep(item));
+    } else {
+      result.push(item);
+    }
+  }
+  
+  return result;
+}
+
+// 测试
+const arr = [1, [2, [3, [4, 5]], 6]];
+console.log(flattenDeep(arr)); // [1, 2, 3, 4, 5, 6]
+```
+
+3、reduce实现
+```
+function flattenDeep(arr) {
+  return arr.reduce((acc, cur) => {
+    // 如果当前元素是数组，则递归调用，并将结果合并到累加器
+    // 如果不是，则直接将当前元素放入累加器
+    return acc.concat(Array.isArray(cur) ? flattenDeep(cur) : cur);
+  }, []);
+}
+
+// 测试
+const arr = [1, [2, [3, [4, 5]], 6]];
+console.log(flattenDeep(arr)); // [1, 2, 3, 4, 5, 6]
+```
+4、指定深度
+```
+// depth 为扁平化深度，默认为无限深度（用 Infinity 表示）
+function flattenDepth(arr, depth = Infinity) {
+  // 如果深度为0，直接返回原数组的浅拷贝
+  if (depth < 1) return arr.slice();
+
+  return arr.reduce((acc, cur) => {
+    // 如果当前元素是数组且深度还未用完，则递归调用，深度减1
+    if (Array.isArray(cur) && depth > 0) {
+      acc.push(...flattenDepth(cur, depth - 1));
+    } else {
+      acc.push(cur);
+    }
+    return acc;
+  }, []);
+}
+
+// 测试
+const arr = [1, [2, [3, [4, 5]], 6]];
+
+console.log(flattenDepth(arr, 1)); // [1, 2, [3, [4, 5]], 6]
+console.log(flattenDepth(arr, 2)); // [1, 2, 3, [4, 5], 6]
+console.log(flattenDepth(arr, 3)); // [1, 2, 3, 4, 5, 6] (等同于 Infinity)
+```

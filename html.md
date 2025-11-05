@@ -172,3 +172,53 @@ ISP DNS 服务器：如果以上都没有，会向互联网服务提供商（ISP
 第三次：服务器发送 FIN 包，表示服务器也数据发送完毕，准备关闭。
 第四次：浏览器返回 ACK 包，确认关闭。等待一段时间后，双方连接正式关闭。
 
+##### 什么是重排重绘
+###### 重排：布局改变，需要重新计算几何属性
+几何属性：
+width, height
+padding, margin, border
+top, left, right, bottom
+font-size, line-height
+
+添加或删除 DOM 元素（display: none会触发重排，visibility: hidden只会触发重绘）
+元素位置改变（如改变 position的值）
+修改 display属性（如 block改为 inline-block）
+激活 CSS 伪类（如 :hover如果改变了布局）
+计算或获取元素的几何信息（这非常关键！）
+offsetTop, offsetLeft, offsetWidth, offsetHeight
+scrollTop, scrollLeft, scrollWidth, scrollHeight
+clientTop, clientLeft, clientWidth, clientHeight
+getComputedStyle()或 currentStyle（IE）
+
+改变浏览器窗口大小（resize事件）
+改变网页中的文字大小
+内容变化（如用户输入文本）
+
+###### 重绘：外观改变，但不影响布局
+
+color
+border-style, border-radius
+visibility（注意：与 display:none不同，visibility:hidden只触发重绘）
+text-decoration
+background相关属性（background-color, background-image等）
+outline相关属性
+box-shadow
+
+JavaScript-> 2. 样式计算-> 3. 布局-> 4. 绘制-> 5. 合成
+重排：也叫 回流。当渲染树中的一部分（或全部）因为元素的尺寸、布局、隐藏等改变而需要重新构建。这个过程发生在上述流程的第 3 步（布局）。重排一定会触发后续的重绘。
+重绘：当元素发生的改变只影响其外观、风格，而不会影响其布局时，浏览器会重新绘制受影响的元素。这个过程发生在上述流程的第 4 步（绘制）。
+
+
+##### DOCTYPE的作用
+文件头声明
+告诉浏览器当前HTML文件使用哪个版本的html标准，确保浏览器以正确的方式渲染页面
+
+##### 块级元素和行内元素的区别？分别有哪些
+块级元素：独占一行，前后有换行，默认宽度100%，可以设置宽高，完整的盒模型，可以包含块级元素盒行内元素
+行内元素：与其他行内元素在同一行展示，宽度由内容决定，不可设置宽高，只能包含行内元素盒文本，水平margin/padding有效，垂直无效
+
+块级元素：div,h1-h6,table,form,
+行内元素：span,a,strong,button,label,img,video,audio,svg,canvas,input,select,
+
+行内块元素：
+像行内元素一样水平排列，像块级元素一样可以设置宽高，完整的和模型
