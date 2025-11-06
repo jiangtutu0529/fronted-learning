@@ -98,3 +98,26 @@ const obj = {
   [sym1]: 'value'
 };
 
+##### js字符串方法
+length
+indexOf
+lastindexOf
+includes
+startsWith
+endsWith
+slice
+substring
+substr:从指定位置开始提取指定长度的字符
+
+修改字符串
+replace
+replaceAll
+toUpperCase
+toLowerCase
+concat 
+trim
+padStart
+split
+repeat
+match
+search

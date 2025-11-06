@@ -221,4 +221,3 @@ JavaScript-> 2. 样式计算-> 3. 布局-> 4. 绘制-> 5. 合成
 行内元素：span,a,strong,button,label,img,video,audio,svg,canvas,input,select,
 
 行内块元素：
-像行内元素一样水平排列，像块级元素一样可以设置宽高，完整的和模型

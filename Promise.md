@@ -240,3 +240,59 @@ function resolvePromise(promise2, x, resolve, reject) {
 新Promise的状态由回调函数的返回值决定
 通过递归解析返回值，处理Promise、thenable对象和普通值
 实现了值的传递和错误的冒泡传播
+
+##### 手写实现promise.all
+输入一个可迭代对象
+如果输入不是可迭代对象，返回一个已拒绝的promise
+等待所有promise完成
+如果其中任何一个失败，返回失败的
+返回值：一个新的promise
+```
+// 手写 Promise.all
+Promise.myAll = function(promises) {
+    // 1. 返回一个新的 Promise
+    return new Promise((resolve, reject) => {
+        // 2. 检查输入是否为可迭代对象
+        // 判断 promises 是否可迭代，最基本的是检查是否有 [Symbol.iterator] 方法
+        if (promises == null || typeof promises[Symbol.iterator] !== 'function') {
+            return reject(new TypeError(`${promises} is not iterable`));
+        }
+
+        // 3. 将可迭代对象转为数组，便于处理
+        const promisesArray = Array.from(promises);
+        const len = promisesArray.length;
+
+        // 4. 如果传入的是空数组，直接返回一个已解决状态的 Promise，结果为 []
+        if (len === 0) {
+            return resolve([]);
+        }
+
+        // 5. 初始化结果数组和计数器
+        const results = new Array(len); // 创建一个长度确定的空数组，用于存放结果
+        let completedCount = 0; // 记录已完成的 Promise 数量（成功或失败）
+
+        // 6. 遍历 promises 数组
+        promisesArray.forEach((promise, index) => {
+            // 6.1 确保当前项是一个 Promise。
+            // 如果传入的不是 Promise（比如数字、字符串），用 Promise.resolve() 包装它，使其成为 Promise
+            Promise.resolve(promise)
+                .then((value) => {
+                    // 6.2 当一个 Promise 成功解决时
+                    // 关键：将结果存入 results 数组的对应索引位置，保证顺序
+                    results[index] = value;
+                    completedCount++;
+
+                    // 6.3 检查是否所有 Promise 都已完成（无论成功失败）
+                    // 只有当所有都成功完成时，才 resolve 最终结果
+                    if (completedCount === len) {
+                        resolve(results); // 所有 Promise 都成功，返回结果数组
+                    }
+                })
+                .catch((reason) => {
+                    // 6.4 如果其中任何一个 Promise 被拒绝，立即拒绝整个 Promise.all
+                    reject(reason);
+                });
+        });
+    });
+};
+```

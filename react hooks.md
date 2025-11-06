@@ -185,3 +185,12 @@ const MyContext = React.createContext(defaultValue);
 解决：
 在useEffect内部定义和调用异步函数，
 使用立即执行函数
+
+
+##### hooks使用限制
+1、只在最顶层使用
+不在条件，循环，嵌套函数中调用
+2、只在react函数中调用
+只在组件和自定义hooks中调用
+
+原因：React 内部使用一个“内存单元”的链表来存储每个组件的 Hook 状态。每次组件渲染时，它都会按照 固定的顺序来遍历这个链表，读取或更新对应的状态。
