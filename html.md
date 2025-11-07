@@ -221,3 +221,10 @@ JavaScript-> 2. 样式计算-> 3. 布局-> 4. 绘制-> 5. 合成
 行内元素：span,a,strong,button,label,img,video,audio,svg,canvas,input,select,
 
 行内块元素：
+
+##### href和src的区别
+href：用于定义当前文档与外部资源之间的关系
+当浏览器遇到href时，会并行加载资源，不会阻塞页面的继续解析
+
+src:用于将外部资源嵌入到当前文档中
+当浏览器遇到src时，会暂停HTML解析，先加载并执行/显示该资源

@@ -164,3 +164,93 @@ console.log(flattenDepth(arr, 1)); // [1, 2, [3, [4, 5]], 6]
 console.log(flattenDepth(arr, 2)); // [1, 2, 3, [4, 5], 6]
 console.log(flattenDepth(arr, 3)); // [1, 2, 3, 4, 5, 6] (等同于 Infinity)
 ```
+
+##### 遍历方法
+for in和for of
+for in适合遍历对象属性，但是也会遍历原型链上的属性，需要用hasOwnProperty过滤掉，遍历结果为属性名，键值
+for of遍历可迭代属性，可迭代对象（Array, Map, Set, String等），遍历结果为属性值
+
+如何遍历对象
+1、for...in 循环
+```
+const person = {
+    name: 'John',
+    age: 30,
+    city: 'New York'
+};
+
+// 遍历对象自身和继承的可枚举属性
+for (let key in person) {
+    console.log(key + ': ' + person[key]);
+}
+// 输出:
+// name: John
+// age: 30
+// city: New York
+
+// 只遍历自身属性（推荐）
+for (let key in person) {
+    if (person.hasOwnProperty(key)) {
+        console.log(key + ': ' + person[key]);
+    }
+}
+```
+2、Object.keys() + forEach()
+```
+const person = { name: 'John', age: 30, city: 'New York' };
+
+Object.keys(person).forEach(key => {
+    console.log(key + ': ' + person[key]);
+});
+
+// 或者使用数组方法
+Object.keys(person).forEach(key => {
+    console.log(`${key}: ${person[key]}`);
+});
+```
+3、Object.values() - 遍历值
+```
+const person = { name: 'John', age: 30, city: 'New York' };
+
+Object.values(person).forEach(value => {
+    console.log(value);
+});
+// 输出:
+// John
+// 30
+// New York
+```
+4、Object.entries() - 遍历键值对
+```
+const person = { name: 'John', age: 30, city: 'New York' };
+
+// 使用 for...of
+for (let [key, value] of Object.entries(person)) {
+    console.log(`${key}: ${value}`);
+}
+
+// 使用 forEach
+Object.entries(person).forEach(([key, value]) => {
+    console.log(`${key}: ${value}`);
+});
+
+// 输出:
+// name: John
+// age: 30
+// city: New York
+```
+
+5、for of
+```
+const person = { name: 'John', age: 30, city: 'New York' };
+
+// 使用 for...of 配合 Object.keys()
+for (let key of Object.keys(person)) {
+    console.log(key + ': ' + person[key]);
+}
+
+// 使用 for...of 配合 Object.entries()
+for (let [key, value] of Object.entries(person)) {
+    console.log(key + ': ' + value);
+}
+```
