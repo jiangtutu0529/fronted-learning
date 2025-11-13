@@ -1,4 +1,14 @@
 ##### webWorker
+优势：
+1、不会阻塞 UI 渲染和用户交互
+2、可以执行计算密集型任务
+3、真正实现多线程编程
+
+限制：
+1、无法访问 DOM​ - Worker 不能直接操作页面元素
+2、无法使用 window 对象​ - 使用 self代替
+3、通信通过消息传递​ - 数据需要序列化
+4、同源策略​ - Worker 脚本必须与主页面同源
 ```
 const createWorker = () => {
   try {
@@ -38,10 +48,8 @@ export const getWorker = () => {
     worker = createWorker();
     if (worker) {
       // 发送测试消息
-      worker.postMessage({cdd-  5
-      ]\L
-        t/
-        ype: "test",
+      worker.postMessage({
+        type: "test",
         payload: {
           type: "test",
           message: "Worker 初始化测试",

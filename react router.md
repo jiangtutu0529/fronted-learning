@@ -157,3 +157,8 @@ React Router 在它的顶层维护着一个内部状态（例如 location对象�
 当 location状态发生变化时，所有消费了这个 Context 的组件（例如 <Routes>, useLocation等）都会收到通知。
 ​​<Routes>组件的工作​​：它会遍历其所有的子 <Route>元素，将它们的 path属性与新的 location.pathname进行匹配。
 ​​匹配与渲染​​：一旦找到匹配的 <Route>，<Routes>就会渲染其 element属性所对应的 React 组件。不匹配的组件则不会被渲染。
+
+
+##### hash模式和history模式区别
+监听hash值的变化
+监听popstate的变化
