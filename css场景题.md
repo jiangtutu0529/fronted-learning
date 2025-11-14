@@ -398,6 +398,18 @@ rem相对于根元素也就是html的font-size大小
 
 对于需要全局统一的尺寸用 rem，对于需要与当前字体大小成比例缩放的尺寸用 em
 
+##### 响应式布局方案
+1、viewport的设置，
+width=device-width：让页面宽度等于设备宽度
+initial-scale=1.0：初始缩放比例为1
+user-scalable=no：禁止用户缩放（可选）
+maximum-scale=1.0：最大缩放比例（可选）
+2、@media screen 媒体查询
+3、flex弹性布局
+4、CSS Grid 网格布局
+5、em,rem,vh,vw
+6、百分比
+
 
 ##### 写一个图片懒加载
 图片懒加载属性loading = 'lazy'
